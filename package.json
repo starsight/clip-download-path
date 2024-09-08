@@ -37,6 +37,16 @@
     ],
     "host_permissions": [
       "https://*/*"
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "assets/small_icon.png"
+        ],
+        "matches": [
+          "*://*/*"
+        ]
+      }
     ]
   }
 }

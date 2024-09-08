@@ -76,7 +76,7 @@ function copyToClipboard(text: string) {
           handleClipboardError('执行脚本失败: ' + chrome.runtime.lastError.message);
         } else if (results && results[0] && results[0].result === true) {
           console.log('路径已复制到剪贴板, path: ' + text);
-          notifyUser('文件路径已复制到剪贴板');
+          // notifyUser('文件路径已复制到剪贴板');
         } else {
           handleClipboardError('复制失败');
         }
@@ -93,10 +93,10 @@ function handleClipboardError(errorMessage) {
 }
 
 
-function notifyUser(message) {
+function notifyUser(message: string) {
   chrome.notifications.create({
     type: 'basic',
-    iconUrl: 'icon.png',  // 确保这个文件存在
+    iconUrl: chrome.runtime.getURL('assets/small_icon.png'),  // 使用chrome.runtime.getURL获取正确的URL
     title: '下载完成',
     message: message
   }, (notificationId) => {
