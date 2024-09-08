@@ -34,7 +34,7 @@ export function ToggleSwitch() {
   }
 
   return (
-    <div>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <span>启用自动复制: </span>
       <Switch checked={!isDisabled} onChange={handleToggle} />
     </div>

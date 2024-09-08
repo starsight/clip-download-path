@@ -7,23 +7,20 @@ const { Header, Content, Footer } = Layout
 const { Title } = Typography
 
 function IndexPopup() {
-  useEffect(() => {
-    document.body.style.width = "400px"
-    document.body.style.height = "300px"
-  }, [])
-
   return (
-    <Layout style={{ height: "100%" }}>
-      <Header style={{ background: "#fff", padding: "0 16px" }}>
-        <Title level={4}>Clip Download Path</Title>
-      </Header>
-      <Content style={{ padding: "16px" }}>
-        <Main />
-      </Content>
-      <Footer style={{ textAlign: "center" }}>
-        Clip Download Path ©2023 Created by You
-      </Footer>
-    </Layout>
+    <div style={{ height: "300px", width: "250px" }} >
+      <Layout style={{ height: "300px", width: "250px" }}>
+        <Header style={{ background: "#fff", height: "30px", padding: "0 16px" }}>
+          <Title level={4}>Clip Download Path</Title>
+        </Header>
+        <Content style={{ padding: "10px" }}>
+          <Main />
+        </Content>
+        <Footer style={{ textAlign: "center",padding: "16px" }}>
+          Clip Download Path ©2024 Created by wenjie
+        </Footer>
+      </Layout>
+    </div>
   )
 }
 
