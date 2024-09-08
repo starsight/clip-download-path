@@ -1,12 +1,28 @@
 export { }
 
-console.log(
-  "Live now; make now always the most precious time. Now will never come again."
-)
+console.log("Background script 已加载")
+
+let copyDisabled = false
+
+// 初始化时从存储中读取copyDisabled的值
+chrome.storage.local.get(["copyDisabled"], (result) => {
+  copyDisabled = result.copyDisabled ?? false
+  console.log("Background: 初始化copyDisabled值为", copyDisabled)
+})
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log("Background: 收到消息", message, "来自", sender)
+  if (message && message.action === "toggleCopy") {
+    copyDisabled = message.disabled
+    console.log("Background: 复制功能已", copyDisabled ? "禁用" : "启用")
+    sendResponse({ status: "success", received: true })
+    return true  // 表示我们将异步发送响应
+  }
+})
 
 // 监听下载完成事件
 chrome.downloads.onChanged.addListener((delta) => {
-  if (delta.state && delta.state.current === "complete") {
+  if (!copyDisabled && delta.state && delta.state.current === "complete") {
     // 获取下载的文件信息
     chrome.downloads.search({ id: delta.id }, (results) => {
       if (results && results.length > 0) {
@@ -18,6 +34,7 @@ chrome.downloads.onChanged.addListener((delta) => {
     });
   }
 });
+
 function copyToClipboard(text) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if (tabs[0]) {
