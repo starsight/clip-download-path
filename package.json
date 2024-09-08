@@ -32,7 +32,8 @@
       "notifications",
       "scripting",
       "activeTab",
-      "clipboardWrite"
+      "clipboardWrite",
+      "storage"
     ],
     "host_permissions": [
       "https://*/*"

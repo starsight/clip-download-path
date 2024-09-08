@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Button, message } from "antd"
 import { CopyOutlined } from "@ant-design/icons"
+import { ToggleSwitch } from "./ToggleSwitch"
 
 export function Main() {
   const [latestPath, setLatestPath] = useState<string>("")
@@ -34,6 +35,7 @@ export function Main() {
 
   return (
     <div>
+      <ToggleSwitch />
       <p>最新下载文件路径:</p>
       <p style={{ wordBreak: "break-all" }}>{latestPath || "暂无下载记录"}</p>
       <Button
