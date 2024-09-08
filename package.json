@@ -24,6 +24,13 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "permissions": [
+      "downloads",
+      "notifications",
+      "scripting",
+      "activeTab",
+      "clipboardWrite"
+    ],
     "host_permissions": [
       "https://*/*"
     ]
