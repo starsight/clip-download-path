@@ -1,13 +1,27 @@
+import { textToClipboard } from "./utils/clipboard";
+
 export { }
 
 console.log("Background script 已加载")
 
 let copyDisabled = false
+let escapeEnabled = false
 
-// 初始化时从存储中读取copyDisabled的值
-chrome.storage.local.get(["copyDisabled"], (result) => {
+function detectOS() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  if (userAgent.indexOf("win") > -1) return "Windows";
+  if (userAgent.indexOf("mac") > -1) return "MacOS";
+  if (userAgent.indexOf("linux") > -1) return "Linux";
+  return "Unknown";
+}
+
+const currentOS = detectOS();
+
+// 初始化时从存储中读取设置
+chrome.storage.local.get(["copyDisabled", "escapeEnabled"], (result) => {
   copyDisabled = result.copyDisabled ?? false
-  console.log("Background: 初始化copyDisabled值为", copyDisabled)
+  escapeEnabled = result.escapeEnabled ?? true
+  console.log("Background: 初始化设置", { copyDisabled, escapeEnabled, os: currentOS })
 })
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -16,24 +30,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     copyDisabled = message.disabled
     console.log("Background: 复制功能已", copyDisabled ? "禁用" : "启用")
     sendResponse({ status: "success", received: true })
-    return true  // 表示我们将异步发送响应
+  } else if (message && message.action === "toggleEscape") {
+    escapeEnabled = message.enabled
+    console.log("Background: 转义功能已", escapeEnabled ? "启用" : "禁用")
+    sendResponse({ status: "success", received: true })
   }
+  return true  // 表示我们将异步发送响应
 })
 
 // 监听下载完成事件
 chrome.downloads.onChanged.addListener((delta) => {
   if (!copyDisabled && delta.state && delta.state.current === "complete") {
-    // 获取下载的文件信息
     chrome.downloads.search({ id: delta.id }, (results) => {
       if (results && results.length > 0) {
-        const filePath = results[0].filename;
+        let filePath = results[0].filename;
+        if (escapeEnabled) {
+          filePath = escapeSpecialChars(filePath);
+        }
         console.log("下载 success: ", results[0]);
-        // 复制路径到剪贴板
         copyToClipboard(filePath);
       }
     });
   }
 });
+
+function escapeSpecialChars(str: string): string {
+  if (currentOS === "Windows") {
+    // Windows系统: 在整个路径外层加上双引号
+    return `"${str}"`;
+  } else {
+    // 其他系统(Unix, Mac): 只转义空格
+    return str.replace(/ /g, '\\ ');
+  }
+}
 
 function copyToClipboard(text) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -61,36 +90,6 @@ function handleClipboardError(errorMessage) {
   notifyUser('复制文件路径失败: ' + errorMessage);
 }
 
-function textToClipboard(text) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('主方案 copy to clipboard successfully');
-    }).catch(err => {
-      console.error('主方案 Failed to copy!!: ', err);
-      // 回退到 document.execCommand('copy')
-      fallbackCopyToClipboard(text);
-    });
-  } else {
-      // 回退到 document.execCommand('copy')
-      fallbackCopyToClipboard(text);
-  }
-
-  function fallbackCopyToClipboard(text) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    // textArea.focus();
-    textArea.select();
-    try {
-      const successful = document.execCommand('copy');
-      const msg = successful ? 'successful' : 'unsuccessful';
-      console.log('备用方案 copy to clipboard ' + msg);
-    } catch (err) {
-      console.error('备用方案: Failed to copy', err);
-    }
-    document.body.removeChild(textArea);
-  }
-}
 
 function notifyUser(message) {
   chrome.notifications.create({

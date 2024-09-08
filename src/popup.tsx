@@ -8,15 +8,15 @@ const { Title } = Typography
 
 function IndexPopup() {
   return (
-    <div style={{ height: "300px", width: "250px" }} >
-      <Layout style={{ height: "300px", width: "250px" }}>
+    <div style={{ height: "350px", width: "250px" }} >
+      <Layout style={{ height: "350px", width: "250px" }}>
         <Header style={{ background: "#fff", height: "30px", padding: "0 16px" }}>
           <Title level={4}>Clip Download Path</Title>
         </Header>
         <Content style={{ padding: "10px" }}>
           <Main />
         </Content>
-        <Footer style={{ textAlign: "center",padding: "16px" }}>
+        <Footer style={{ textAlign: "center", padding: "16px" }}>
           Clip Download Path ©2024 Created by wenjie
         </Footer>
       </Layout>

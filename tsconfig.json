@@ -14,7 +14,6 @@
         "./*"
       ]
     },
-    "baseUrl": ".",
-    "typeRoots": ["./node_modules/@types", "./node_modules/antd/lib"]
+    "baseUrl": "."
   }
 }

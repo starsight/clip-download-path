@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react"
 import { Button, message } from "antd"
 import { CopyOutlined } from "@ant-design/icons"
-import { ToggleSwitch } from "./ToggleSwitch"
+import { EscapeToggle, ToggleSwitch } from "./ToggleSwitch"
+import { currentOS } from "~src/utils/osDetector"
+import { textToClipboard } from "~src/utils/clipboard"
 
 export function Main() {
     const [latestPath, setLatestPath] = useState<string>("")
+    const [escapeEnabled, setEscapeEnabled] = useState(false)
 
     useEffect(() => {
         chrome.downloads.search({ state: 'complete' }, function (downloads) {
@@ -18,7 +21,22 @@ export function Main() {
                 setLatestPath('')
             }
         });
+
+        // 获取escapeEnabled的初始值
+        chrome.storage.local.get(["escapeEnabled"], (result) => {
+            setEscapeEnabled(result.escapeEnabled ?? true)
+        })
     }, [])
+
+    const escapeSpecialChars = (str: string): string => {
+        if (currentOS === "Windows") {
+            // Windows系统: 在整个路径外层加上双引号
+            return `"${str}"`;
+        } else {
+            // 其他系统(Unix, Mac): 只转义空格
+            return str.replace(/ /g, '\\ ');
+        }
+    }
 
     const copyToClipboard = async () => {
         if (!latestPath) {
@@ -26,7 +44,12 @@ export function Main() {
             return
         }
         try {
-            await navigator.clipboard.writeText(latestPath)
+            let pathToCopy = latestPath
+            if (escapeEnabled) {
+                pathToCopy = escapeSpecialChars(latestPath)
+            }
+            textToClipboard(pathToCopy);
+            // await navigator.clipboard.writeText(pathToCopy)
             message.success("路径已复制到剪贴板")
         } catch (err) {
             message.error("复制失败")
@@ -34,9 +57,12 @@ export function Main() {
     }
 
     return (
-        <div>
-            <div style={{ marginBottom: "16px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ marginBottom: "0px" }}>
                 <ToggleSwitch />
+            </div>
+            <div style={{ marginBottom: "8px" }}>
+                <EscapeToggle onToggle={(checked) => setEscapeEnabled(checked)} />
             </div>
             <p>最新下载文件路径:</p>
             <p style={{ wordBreak: "break-all" }}>{latestPath || "暂无下载记录"}</p>
