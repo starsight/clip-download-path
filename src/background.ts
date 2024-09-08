@@ -64,7 +64,7 @@ function escapeSpecialChars(str: string): string {
   }
 }
 
-function copyToClipboard(text) {
+function copyToClipboard(text: string) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if (tabs[0]) {
       chrome.scripting.executeScript({
@@ -74,9 +74,11 @@ function copyToClipboard(text) {
       }, (results) => {
         if (chrome.runtime.lastError) {
           handleClipboardError('执行脚本失败: ' + chrome.runtime.lastError.message);
-        } else {
+        } else if (results && results[0] && results[0].result === true) {
           console.log('路径已复制到剪贴板, path: ' + text);
-          // notifyUser('文件路径已复制到剪贴板');
+          notifyUser('文件路径已复制到剪贴板');
+        } else {
+          handleClipboardError('复制失败');
         }
       });
     } else {

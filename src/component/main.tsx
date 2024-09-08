@@ -48,9 +48,12 @@ export function Main() {
             if (escapeEnabled) {
                 pathToCopy = escapeSpecialChars(latestPath)
             }
-            textToClipboard(pathToCopy);
-            // await navigator.clipboard.writeText(pathToCopy)
-            message.success("路径已复制到剪贴板")
+            const success = await textToClipboard(pathToCopy)
+            if (success) {
+                message.success("路径已复制到剪贴板")
+            } else {
+                message.error("复制失败")
+            }
         } catch (err) {
             message.error("复制失败")
         }
