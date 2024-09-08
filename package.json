@@ -3,7 +3,7 @@
   "displayName": "Clip download path",
   "version": "0.0.1",
   "description": "clip download file path",
-  "author": "172583172@qq/com",
+  "author": "172583172@qq.com",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
